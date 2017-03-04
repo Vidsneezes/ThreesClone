@@ -54,10 +54,28 @@ PhaserGame.prototype = {
               }
             }
         }
-        
-       
+
+        this.upKey = game.input.keyboard.addKey(Phaser.Keyboard.UP);
+        this.downKey = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
+        this.leftKey = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
+        this.rightKey = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
     },
     update: function(){
+        if(this.upKey.downDuration(1)){
+            console.log("key press");
+        }
+    },
+    resolveCollision: function(tileA,tileB,direction){
+        if(direction == 1){
+            //check left
+        }else if(direction == 2){
+            //check right
+        }else if(direction == 3){
+            //check up
+        }else if(direction == 4){
+            //check down
+        }
+
     }
 };
 
