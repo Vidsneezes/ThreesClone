@@ -60,15 +60,25 @@ PhaserGame.prototype = {
         var test = game.add.sprite(5,5,'playBoard');
         this.board = [];
         this.tiles = [1,0,0,0,
-                     0,0,0,0,
-                     0,0,0,0,
-                     1,0,0,0];
-        console.log(""+this.tiles);
+                     1,0,0,0,
+                     2,0,0,0,
+                     4,0,0,0];
+        this.printTiles();
         this.upKey = game.input.keyboard.addKey(Phaser.Keyboard.UP);
         this.downKey = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
         this.leftKey = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
         this.rightKey = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
         this.state = 0;
+    },
+    printTiles: function(){
+        let m = "";
+        for(var j =0; j < 4; j++){
+            for(var i=0; i < 4; i++){
+                m = m + "" + this.tiles[i+j*4];
+            }
+            m = m +"\n";
+        }
+        console.log(m);
     },
     update: function(){
         if(this.state === 0){
@@ -77,10 +87,13 @@ PhaserGame.prototype = {
     },
     inputState: function(){
         if(this.upKey.downDuration(1)){
-        }else if(this.downKey.downDuration(1)){
-            this.moveTileLogic();
+            this.moveTileLogic(1);
             this.trySpawnNew();
-            console.log(""+this.tiles);
+            this.printTiles();
+        }else if(this.downKey.downDuration(1)){
+            this.moveTileLogic(0);
+            this.trySpawnNew();
+            this.printTiles();
         }else if(this.leftKey.downDuration(1)){
         }else if(this.rightKey.downDuration(1)){
         }
@@ -91,34 +104,60 @@ PhaserGame.prototype = {
             if(this.tiles[i] === 0){
                 container.push(i);
             }
+            this.tiles[i] = Math.abs(this.tiles[i]);
         }
-        let randM = Math.min(Math.floor((Math.random() * container.length)-1),0);
-        this.tiles[randM] = 1;
+        const unclampRand = Math.floor(Math.random() * container.length);
+        const randM = Math.min(Math.max(0,unclampRand),container.length-1);
+        if(container.length > 0){
+            this.tiles[container[randM]] = 1;
+        }
     },
-    moveTileLogic: function(){
-        for(var j=3;j >= 0;j--){
-            for(var i=0; i < 4; i++){
-                if(this.tiles[i+j*4] !== 0)
-                {
-                    this.moveTile(i,j,true);
+    moveTileLogic: function(typeDef){
+        if(typeDef === 0){
+            for(var j=3;j >= 0;j--){
+                for(var i=0; i < 4; i++){
+                    if(this.tiles[i+j*4] !== 0)
+                    {
+                        this.moveDownRecurser(i,j,true);
+                    }
+                }
+            }
+        }else if(typeDef === 1){
+            for(var j=0;j < 4;j++){
+                for(var i=0; i < 4; i++){
+                    if(this.tiles[i+j*4] !== 0)
+                    {
+                        this.moveUpRecurser(i,j,true);
+                    }
                 }
             }
         }
     },
-    moveTile: function(i,j,canCombine){
-        var nextOf = j+1;
+    moveUpRecurser: function(i,j,canCombine){
+        const nextOf = j-1;
+        if(nextOf >= 0){
+            let tile = {i:i,j:j,canCombine:canCombine,hor:0,ver:-1};
+            this.makeMoveCallback(nextOf,tile,(ix,jx,canC) => {this.moveUpRecurser(ix,jx,canC)});
+        }
+    },
+    moveDownRecurser: function(i,j,canCombine){
+        const nextOf = j+1;
         if(nextOf < 4){
-            var indexThem = this.tiles[i + nextOf*4];
-            var value = this.tiles[i+j*4];
-            if(indexThem === 0){
-                this.tiles[i+nextOf*4] = value;
-                this.tiles[i+j*4] = 0; 
-                this.moveTile(i,j + 1,canCombine);
-            }else if(indexThem === value && canCombine === true){
-                this.tiles[i+nextOf*4] = value + value;
-                this.tiles[i+j*4] = 0;
-                this.moveTile(i,j+1,false);
-            }
+            let tile = {i:i,j:j,canCombine:canCombine,hor:0,ver:1};
+            this.makeMoveCallback(nextOf,tile,(ix,jx,canC) => {this.moveDownRecurser(ix,jx,canC)});
+        }
+    },
+    makeMoveCallback: function(nextOf,tile,recurser){
+        const indexThem = this.tiles[tile.i + nextOf*4];
+        const value = this.tiles[tile.i+tile.j*4];
+        if(indexThem === 0){
+            this.tiles[tile.i+nextOf*4] = value;
+            this.tiles[tile.i+tile.j*4] = 0; 
+            recurser(tile.i+tile.hor,tile.j + tile.ver,tile.canCombine);
+        }else if(indexThem === value && tile.canCombine === true){
+            this.tiles[tile.i+nextOf*4] = -(value + value);
+            this.tiles[tile.i+tile.j*4] = 0;
+            recurser(tile.i+tile.hor,tile.j+tile.ver,false);
         }
     },
     boardRebuildGroup: function(){
