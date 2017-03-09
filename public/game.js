@@ -63,15 +63,13 @@ PhaserGame.prototype = {
                      0,0,0,0,
                      1,0,0,0,
                      0,0,0,0];
-        for(var i = 0; i < 4; i++){
-            for(var j = 0; j < 4; j++){
-              if(this.tiles[i+j*4] == 1){
-                var tile = new BoardPiece();
-                tile.init(i,j);
-                this.board.push(tile);
-              }
+        this.valueCount = 0;
+        for(var i = 0; i < this.tiles.length;i++){
+            if(this.tiles[i] !== 0){
+                this.valueCount++;
             }
         }
+        console.log(this.tiles);
         this.upKey = game.input.keyboard.addKey(Phaser.Keyboard.UP);
         this.downKey = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
         this.leftKey = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
@@ -79,20 +77,45 @@ PhaserGame.prototype = {
         this.state = 0;
     },
     update: function(){
-     if(this.state === 0){
-         this.inputState();
-     }
+        if(this.state === 0){
+            this.inputState();
+        }
     },
     inputState: function(){
         if(this.upKey.downDuration(1)){
-           this.boardMove(0,-1);
         }else if(this.downKey.downDuration(1)){
-           this.boardMove(0,1);
+            this.moveTileLogic(0,1,0);
         }else if(this.leftKey.downDuration(1)){
-            this.boardMove(-1,0);
         }else if(this.rightKey.downDuration(1)){
-           this.boardMove(1,0);
         }
+    },
+    trySpawnNew: function(){
+    },
+    moveTileLogic: function(iter){
+        for(var j=3;j >= iter;j--){
+            for(var i=0; i < 4; i++){
+                var index = i + j*4;
+                if(j + 1 < 4){
+                    var nextOf = j+1;
+                    var indexThem = this.tiles[i + nextOf*4];
+                    var value = this.tiles[i+j*4];
+                    if(indexThem === 0){
+                        this.tiles[i+nextOf*4] = value;
+                        this.tiles[i+j*4] = 0; 
+                    }else if(indexThem === value){
+                        this.tiles[i+nextOf*4] = value + value;
+                        this.tiles[i+j*4] = 0;
+                    }
+                }
+            }
+        }
+        console.log(this.tiles);
+        if(iter < 2){
+            this.moveTileLogic(iter + 1);
+        }
+    },
+    boardRebuildGroup: function(){
+        //rebuild group
     },
     resolveCollision: function(tileA,tileB,direction){
         if(direction == 1){
