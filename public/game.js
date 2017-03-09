@@ -113,25 +113,19 @@ PhaserGame.prototype = {
         }
     },
     moveTileLogic: function(typeDef){
-        if(typeDef === 0){
-            for(var j=3;j >= 0;j--){
-                for(var i=0; i < 4; i++){
-                    if(this.tiles[i+j*4] !== 0)
+         this.tiles.forEach((tile,index)=>{
+                if(tile !== 0)
+                {
+                    const j = Math.floor(index / 4);
+                    const i = index - j*4;
+                    if(typeDef === 0)
                     {
                         this.moveDownRecurser(i,j,true);
-                    }
-                }
-            }
-        }else if(typeDef === 1){
-            for(var j=0;j < 4;j++){
-                for(var i=0; i < 4; i++){
-                    if(this.tiles[i+j*4] !== 0)
-                    {
+                    }else if(typeDef === 1){
                         this.moveUpRecurser(i,j,true);
                     }
                 }
-            }
-        }
+        });
     },
     moveUpRecurser: function(i,j,canCombine){
         const nextOf = j-1;
