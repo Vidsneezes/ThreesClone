@@ -87,16 +87,19 @@ PhaserGame.prototype = {
     },
     inputState: function(){
         if(this.upKey.downDuration(1)){
-            this.moveTileLogic(1);
-            this.trySpawnNew();
-            this.printTiles();
+            this.makeMove(1);
         }else if(this.downKey.downDuration(1)){
-            this.moveTileLogic(0);
-            this.trySpawnNew();
-            this.printTiles();
+            this.makeMove(0);
         }else if(this.leftKey.downDuration(1)){
+            this.makeMove(2);
         }else if(this.rightKey.downDuration(1)){
+            this.makeMove(3);
         }
+    },
+    makeMove(typeDef){
+        this.moveTileLogic(typeDef);
+        this.trySpawnNew();
+        this.printTiles();
     },
     trySpawnNew: function(){
         let container = [];
@@ -131,6 +134,24 @@ PhaserGame.prototype = {
                     }
                 }
             }
+        }else if(typeDef === 2){
+            for(var j=0;j < 4;j++){
+                for(var i=0; i < 4; i++){
+                    if(this.tiles[i+j*4] !== 0)
+                    {
+                        this.moveLeftRecurser(i,j,true);
+                    }
+                }
+            }
+        }else if(typeDef === 3){
+            for(var j=3;j >= 0;j--){
+                for(var i=0; i < 4; i++){
+                    if(this.tiles[i+j*4] !== 0)
+                    {
+                        this.moveRightRecurser(i,j,true);
+                    }
+                }
+            }
         }
     },
     moveUpRecurser: function(i,j,canCombine){
@@ -147,6 +168,22 @@ PhaserGame.prototype = {
             const nextThen = i + augmented*4;
             let tile = {i:i,j:j,canCombine:canCombine,hor:0,ver:1};
             this.makeMoveCallback(nextThen,tile,(ix,jx,canC) => {this.moveDownRecurser(ix,jx,canC)});
+        }
+    },
+    moveRightRecurser: function(i,j,canCombine){
+        const augmented = i+1;
+        if(augmented < 4){
+            const nextThen = augmented + j*4;
+            let tile = {i:i,j:j,canCombine:canCombine,hor:1,ver:0};
+            this.makeMoveCallback(nextThen,tile,(ix,jx,canC) => {this.moveRightRecurser(ix,jx,canC)});
+        }
+    },
+    moveLeftRecurser: function(i,j,canCombine){
+        const augmented = i-1;
+        if(augmented >= 0){
+            const nextThen = augmented + j*4;
+            let tile = {i:i,j:j,canCombine:canCombine,hor:-1,ver:0};
+            this.makeMoveCallback(nextThen,tile,(ix,jx,canC) => {this.moveLeftRecurser(ix,jx,canC)});
         }
     },
     makeMoveCallback: function(nextOf,tile,recurser){
