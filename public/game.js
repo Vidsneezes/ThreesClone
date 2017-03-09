@@ -179,8 +179,11 @@ PhaserGame.prototype = {
                 }
             }
             for(var i=0;i < moveList.length;i++){
-                if(this.checkCollision(moveList[i],0,1) === false){
+                const occupiedGroup = this.checkCollision(moveList[i],0,1);
+                if(occupiedGroup.occupied === false){
                     moveList[i].TryMove(0,1);
+                }else {
+                    
                 }
             }
             moveList = [];
@@ -194,10 +197,10 @@ PhaserGame.prototype = {
         y = tile.indexedPosition.y + y;
         for(var i=0;i < this.board.length;i++){
             if(this.board[i].indexedPosition.x === x && this.board[i].indexedPosition.y === y){
-                return true;
+                return {occupied: true, iPos: i};
             }
         }
-        return false;
+        return {occupied: false};
     }
 };
 
