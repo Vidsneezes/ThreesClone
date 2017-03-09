@@ -61,15 +61,9 @@ PhaserGame.prototype = {
         this.board = [];
         this.tiles = [1,0,0,0,
                      0,0,0,0,
-                     1,0,0,0,
-                     0,0,0,0];
-        this.valueCount = 0;
-        for(var i = 0; i < this.tiles.length;i++){
-            if(this.tiles[i] !== 0){
-                this.valueCount++;
-            }
-        }
-        console.log(this.tiles);
+                     0,0,0,0,
+                     1,0,0,0];
+        console.log(""+this.tiles);
         this.upKey = game.input.keyboard.addKey(Phaser.Keyboard.UP);
         this.downKey = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
         this.leftKey = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
@@ -84,34 +78,47 @@ PhaserGame.prototype = {
     inputState: function(){
         if(this.upKey.downDuration(1)){
         }else if(this.downKey.downDuration(1)){
-            this.moveTileLogic(0,1,0);
+            this.moveTileLogic();
+            this.trySpawnNew();
+            console.log(""+this.tiles);
         }else if(this.leftKey.downDuration(1)){
         }else if(this.rightKey.downDuration(1)){
         }
     },
     trySpawnNew: function(){
+        let container = [];
+        for(var i = 0; i < this.tiles.length;i++){
+            if(this.tiles[i] === 0){
+                container.push(i);
+            }
+        }
+        let randM = Math.min(Math.floor((Math.random() * container.length)-1),0);
+        this.tiles[randM] = 1;
     },
-    moveTileLogic: function(iter){
-        for(var j=3;j >= iter;j--){
+    moveTileLogic: function(){
+        for(var j=3;j >= 0;j--){
             for(var i=0; i < 4; i++){
-                var index = i + j*4;
-                if(j + 1 < 4){
-                    var nextOf = j+1;
-                    var indexThem = this.tiles[i + nextOf*4];
-                    var value = this.tiles[i+j*4];
-                    if(indexThem === 0){
-                        this.tiles[i+nextOf*4] = value;
-                        this.tiles[i+j*4] = 0; 
-                    }else if(indexThem === value){
-                        this.tiles[i+nextOf*4] = value + value;
-                        this.tiles[i+j*4] = 0;
-                    }
+                if(this.tiles[i+j*4] !== 0)
+                {
+                    this.moveTile(i,j,true);
                 }
             }
         }
-        console.log(this.tiles);
-        if(iter < 2){
-            this.moveTileLogic(iter + 1);
+    },
+    moveTile: function(i,j,canCombine){
+        var nextOf = j+1;
+        if(nextOf < 4){
+            var indexThem = this.tiles[i + nextOf*4];
+            var value = this.tiles[i+j*4];
+            if(indexThem === 0){
+                this.tiles[i+nextOf*4] = value;
+                this.tiles[i+j*4] = 0; 
+                this.moveTile(i,j + 1,canCombine);
+            }else if(indexThem === value && canCombine === true){
+                this.tiles[i+nextOf*4] = value + value;
+                this.tiles[i+j*4] = 0;
+                this.moveTile(i,j+1,false);
+            }
         }
     },
     boardRebuildGroup: function(){
