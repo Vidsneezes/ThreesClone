@@ -113,43 +113,51 @@ PhaserGame.prototype = {
         }
     },
     moveTileLogic: function(typeDef){
-         this.tiles.forEach((tile,index)=>{
-                if(tile !== 0)
-                {
-                    const j = Math.floor(index / 4);
-                    const i = index - j*4;
-                    if(typeDef === 0)
+        if(typeDef === 0){
+            for(var j=3;j >= 0;j--){
+                for(var i=0; i < 4; i++){
+                    if(this.tiles[i+j*4] !== 0)
                     {
                         this.moveDownRecurser(i,j,true);
-                    }else if(typeDef === 1){
+                    }
+                }
+            }
+        }else if(typeDef === 1){
+            for(var j=0;j < 4;j++){
+                for(var i=0; i < 4; i++){
+                    if(this.tiles[i+j*4] !== 0)
+                    {
                         this.moveUpRecurser(i,j,true);
                     }
                 }
-        });
+            }
+        }
     },
     moveUpRecurser: function(i,j,canCombine){
-        const nextOf = j-1;
-        if(nextOf >= 0){
+        const augmented = j-1;
+        if(augmented >= 0){
+            const nextThen = i + augmented*4;
             let tile = {i:i,j:j,canCombine:canCombine,hor:0,ver:-1};
-            this.makeMoveCallback(nextOf,tile,(ix,jx,canC) => {this.moveUpRecurser(ix,jx,canC)});
+            this.makeMoveCallback(nextThen,tile,(ix,jx,canC) => {this.moveUpRecurser(ix,jx,canC)});
         }
     },
     moveDownRecurser: function(i,j,canCombine){
-        const nextOf = j+1;
-        if(nextOf < 4){
+        const augmented = j+1;
+        if(augmented < 4){
+            const nextThen = i + augmented*4;
             let tile = {i:i,j:j,canCombine:canCombine,hor:0,ver:1};
-            this.makeMoveCallback(nextOf,tile,(ix,jx,canC) => {this.moveDownRecurser(ix,jx,canC)});
+            this.makeMoveCallback(nextThen,tile,(ix,jx,canC) => {this.moveDownRecurser(ix,jx,canC)});
         }
     },
     makeMoveCallback: function(nextOf,tile,recurser){
-        const indexThem = this.tiles[tile.i + nextOf*4];
+        const indexThem = this.tiles[nextOf];
         const value = this.tiles[tile.i+tile.j*4];
         if(indexThem === 0){
-            this.tiles[tile.i+nextOf*4] = value;
+            this.tiles[nextOf] = value;
             this.tiles[tile.i+tile.j*4] = 0; 
             recurser(tile.i+tile.hor,tile.j + tile.ver,tile.canCombine);
         }else if(indexThem === value && tile.canCombine === true){
-            this.tiles[tile.i+nextOf*4] = -(value + value);
+            this.tiles[nextOf] = -(value + value);
             this.tiles[tile.i+tile.j*4] = 0;
             recurser(tile.i+tile.hor,tile.j+tile.ver,false);
         }
