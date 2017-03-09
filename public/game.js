@@ -41,6 +41,10 @@ BoardPiece.prototype = {
             }
             this.movePiece();
         }
+    },
+    changeValue: function(){
+        this.baseValue = 4;
+        this.text.setText(this.baseValue);
     }
 }
 
@@ -57,7 +61,7 @@ PhaserGame.prototype = {
         this.board = [];
         this.tiles = [1,0,0,0,
                      0,0,0,0,
-                     0,0,1,0,
+                     1,0,0,0,
                      0,0,0,0];
         for(var i = 0; i < 4; i++){
             for(var j = 0; j < 4; j++){
@@ -173,24 +177,37 @@ PhaserGame.prototype = {
     toDown: function(iter){
         var moveList = [];
         for(var m=3;m >= iter;m--){
-            for(var i=0;i < this.board.length;i++){
-                if(this.board[i].indexedPosition.y === m){
-                    moveList.push(this.board[i]);
-                }
-            }
-            for(var i=0;i < moveList.length;i++){
-                const occupiedGroup = this.checkCollision(moveList[i],0,1);
-                if(occupiedGroup.occupied === false){
-                    moveList[i].TryMove(0,1);
-                }else {
-                    
-                }
-            }
+            moveList = this.buildMoveList(m);
+            this.tryMove(0,1,moveList);
             moveList = [];
         }
         if(iter < 2){
             this.toDown(iter + 1);
         }
+    },
+    tryMove: function(hor, ver, moveList){
+        let toDestroy = [];
+        for(var i=0;i < moveList.length;i++){
+            const occupiedGroup = this.checkCollision(moveList[i],hor,ver);
+            if(occupiedGroup.occupied === false){
+                moveList[i].TryMove(hor,ver);
+            }else {
+                moveList[i].TryMove(hor,ver);
+                moveList[i].changeValue();
+                this.board[occupiedGroup.iPos].changeValue();
+                toDestroy.push()
+            }
+        }
+    }
+    ,
+    buildMoveList: function(m){
+        let moveList = [];
+        for(var i=0;i < this.board.length;i++){
+            if(this.board[i].indexedPosition.y === m){
+                moveList.push(this.board[i]);
+            }
+        }
+        return moveList;
     },
     checkCollision: function(tile,x,y){
         x = tile.indexedPosition.x + x;
