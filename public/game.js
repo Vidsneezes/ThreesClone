@@ -99,9 +99,9 @@ PhaserGame.prototype = {
         this.boardGroup = new BoardGroup();
         this.boardGroup.init();
         this.tiles = [1,0,0,0,
-                     1,0,0,0,
-                     2,0,0,0,
-                     4,0,0,0];
+                     0,0,0,0,
+                     0,0,1,0,
+                     0,0,0,0];
         this.printTiles();
         this.boardRebuildGroup();
         this.upKey = game.input.keyboard.addKey(Phaser.Keyboard.UP);
@@ -186,7 +186,7 @@ PhaserGame.prototype = {
             }
         }else if(typeDef === 3){
             for(var j=3;j >= 0;j--){
-                for(var i=0; i < 4; i++){
+                for(var i=3; i >= 0; i--){
                     if(this.tiles[i+j*4] !== 0)
                     {
                         this.moveRightRecurser(i,j,true);
@@ -227,15 +227,15 @@ PhaserGame.prototype = {
             this.makeMoveCallback(nextThen,tile,(ix,jx,canC) => {this.moveLeftRecurser(ix,jx,canC)});
         }
     },
-    makeMoveCallback: function(nextOf,tile,recurser){
-        const indexThem = this.tiles[nextOf];
+    makeMoveCallback: function(nextThen,tile,recurser){
+        const indexThem = this.tiles[nextThen];
         const value = this.tiles[tile.i+tile.j*4];
         if(indexThem === 0){
-            this.tiles[nextOf] = value;
+            this.tiles[nextThen] = value;
             this.tiles[tile.i+tile.j*4] = 0; 
             recurser(tile.i+tile.hor,tile.j + tile.ver,tile.canCombine);
         }else if(indexThem === value && tile.canCombine === true){
-            this.tiles[nextOf] = -(value + value);
+            this.tiles[nextThen] = -(value + value);
             this.tiles[tile.i+tile.j*4] = 0;
             recurser(tile.i+tile.hor,tile.j+tile.ver,false);
         }
