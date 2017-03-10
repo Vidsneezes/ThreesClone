@@ -8,6 +8,9 @@ var BoardPiece = function() {
 
 }
 
+var BoardGroup = function() {
+}
+
 var presets = {
             xPad: 5,
             yPad: 2,
@@ -48,6 +51,27 @@ BoardPiece.prototype = {
     }
 }
 
+BoardGroup.prototype = {
+    init: function(){
+       this.groupBase = game.add.group();
+       for(var i = 0; i < 16; i++){
+         this.groupBase.create(20+ i,20,'playPiece');
+       }
+       this.groupBase.forEach(function(item){
+         item.kill();
+       });
+    },
+    killAll: function(){
+        this.groupBase.forEach(function(item){
+            item.kill();
+        });
+    },
+    placePiece: function(i,j){
+        var item = this.groupBase.getFirstDead();
+        item.reset(i*presets.tileWidth+presets.xPad,j*presets.tileHeight+presets.yPad);
+    }
+}
+
 PhaserGame.prototype = {
     init: function() {
 
@@ -58,12 +82,14 @@ PhaserGame.prototype = {
     },
     create: function(){
         var test = game.add.sprite(5,5,'playBoard');
-        this.board = [];
+        this.boardGroup = new BoardGroup();
+        this.boardGroup.init();
         this.tiles = [1,0,0,0,
                      1,0,0,0,
                      2,0,0,0,
                      4,0,0,0];
         this.printTiles();
+        this.boardRebuildGroup();
         this.upKey = game.input.keyboard.addKey(Phaser.Keyboard.UP);
         this.downKey = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
         this.leftKey = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
@@ -100,6 +126,7 @@ PhaserGame.prototype = {
         this.moveTileLogic(typeDef);
         this.trySpawnNew();
         this.printTiles();
+        this.boardRebuildGroup();
     },
     trySpawnNew: function(){
         let container = [];
@@ -201,131 +228,14 @@ PhaserGame.prototype = {
     },
     boardRebuildGroup: function(){
         //rebuild group
-    },
-    resolveCollision: function(tileA,tileB,direction){
-        if(direction == 1){
-            //check left
-        }else if(direction == 2){
-            //check right
-        }else if(direction == 3){
-            //check up
-        }else if(direction == 4){
-            //check down
-        }
-
-    },
-    boardMove: function(x,y){
-        if(x === -1){
-            this.toLeft(4);
-        }else if(x === 1){
-            this.toRight(0);
-        }else if(y === 1){
-            this.toDown(0);
-        }else if(y === -1){
-            this.toUp(4);
-        }
-    },
-    toLeft: function(iter){
-        var moveList = [];
-        for(var m=1;m < iter;m++){
-            for(var i=0;i < this.board.length;i++){
-                if(this.board[i].indexedPosition.x === m){
-                    moveList.push(this.board[i]);
-                }
+        this.boardGroup.killAll();
+        this.tiles.forEach((tile, index)=>{
+            if(tile !== 0){
+                const j = Math.floor(index/4);
+                const i = index - (j*4);
+                this.boardGroup.placePiece(i,j);
             }
-            for(var i=0;i < moveList.length;i++){
-                if(this.checkCollision(moveList[i],-1,0) === false){
-                    moveList[i].TryMove(-1,0);
-                }
-            }
-            moveList = [];
-        }
-        if(iter > 2){
-            this.toLeft(iter -1 );
-        }
-    },  
-    toRight: function(iter){
-        var moveList = [];
-        for(var m=3;m >= iter;m--){
-            for(var i=0;i < this.board.length;i++){
-                if(this.board[i].indexedPosition.x === m){
-                    moveList.push(this.board[i]);
-                }
-            }
-            for(var i=0;i < moveList.length;i++){
-                if(this.checkCollision(moveList[i],1,0) === false){
-                    moveList[i].TryMove(1,0);
-                }
-            }
-            moveList = [];
-        }
-        if(iter < 2){
-            this.toRight(iter + 1);
-        }
-    },
-    toUp: function(iter){
-        var moveList = [];
-        for(var m=1;m < iter;m++){
-            for(var i=0;i < this.board.length;i++){
-                if(this.board[i].indexedPosition.y === m){
-                    moveList.push(this.board[i]);
-                }
-            }
-            for(var i=0;i < moveList.length;i++){
-                if(this.checkCollision(moveList[i],0,-1) === false){
-                    moveList[i].TryMove(0,-1);
-                }
-            }
-            moveList = [];
-        }
-        if(iter > 2){
-            this.toUp(iter -1 );
-        }
-    },
-    toDown: function(iter){
-        var moveList = [];
-        for(var m=3;m >= iter;m--){
-            moveList = this.buildMoveList(m);
-            this.tryMove(0,1,moveList);
-            moveList = [];
-        }
-        if(iter < 2){
-            this.toDown(iter + 1);
-        }
-    },
-    tryMove: function(hor, ver, moveList){
-        let toDestroy = [];
-        for(var i=0;i < moveList.length;i++){
-            const occupiedGroup = this.checkCollision(moveList[i],hor,ver);
-            if(occupiedGroup.occupied === false){
-                moveList[i].TryMove(hor,ver);
-            }else {
-                moveList[i].TryMove(hor,ver);
-                moveList[i].changeValue();
-                this.board[occupiedGroup.iPos].changeValue();
-                toDestroy.push()
-            }
-        }
-    }
-    ,
-    buildMoveList: function(m){
-        let moveList = [];
-        for(var i=0;i < this.board.length;i++){
-            if(this.board[i].indexedPosition.y === m){
-                moveList.push(this.board[i]);
-            }
-        }
-        return moveList;
-    },
-    checkCollision: function(tile,x,y){
-        x = tile.indexedPosition.x + x;
-        y = tile.indexedPosition.y + y;
-        for(var i=0;i < this.board.length;i++){
-            if(this.board[i].indexedPosition.x === x && this.board[i].indexedPosition.y === y){
-                return {occupied: true, iPos: i};
-            }
-        }
-        return {occupied: false};
+        });
     }
 };
 
