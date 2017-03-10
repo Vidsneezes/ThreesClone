@@ -11,6 +11,10 @@ var BoardPiece = function() {
 var BoardGroup = function() {
 }
 
+/*
+
+*/
+
 var presets = {
             xPad: 5,
             yPad: 2,
@@ -27,8 +31,6 @@ BoardPiece.prototype = {
             x:i,y:j
         }
         this.sprite = game.add.sprite(i*presets.tileWidth+presets.xPad,j*presets.tileHeight+presets.yPad,'playPiece');
-        this.text = game.add.text(i*presets.tileWidth+presets.xPad+presets.tileWidth*0.5 , j*presets.tileHeight+presets.yPad + presets.tileHeight* 0.5, this.baseValue, style);
-        this.text.anchor.set(0.5);
     },
     movePiece: function(){
         this.sprite.x = this.indexedPosition.x*presets.tileWidth+presets.xPad;
@@ -54,21 +56,33 @@ BoardPiece.prototype = {
 BoardGroup.prototype = {
     init: function(){
        this.groupBase = game.add.group();
+       this.textGroup = game.add.group();
        for(var i = 0; i < 16; i++){
-         this.groupBase.create(20+ i,20,'playPiece');
+            var text = game.add.text(0*presets.tileWidth+presets.xPad+presets.tileWidth*0.5 , 0*presets.tileHeight+presets.yPad + presets.tileHeight* 0.5, "2", style, this.textGroup);
+            text.anchor.set(0.5);
+            this.groupBase.create(20+ i,20,'playPiece');
        }
        this.groupBase.forEach(function(item){
-         item.kill();
+            item.kill();
        });
+       this.textGroup.forEach(function(item){
+            item.kill();
+       })
     },
     killAll: function(){
         this.groupBase.forEach(function(item){
             item.kill();
         });
+        this.textGroup.forEach(function(item){
+            item.kill();
+        })
     },
-    placePiece: function(i,j){
+    placePiece: function(i,j, value){
         var item = this.groupBase.getFirstDead();
         item.reset(i*presets.tileWidth+presets.xPad,j*presets.tileHeight+presets.yPad);
+        var textPiece = this.textGroup.getFirstDead();
+        textPiece.setText(value);
+        textPiece.reset(i*presets.tileWidth+presets.xPad+presets.tileWidth*0.5 , j*presets.tileHeight+presets.yPad + presets.tileHeight* 0.5);
     }
 }
 
@@ -233,7 +247,7 @@ PhaserGame.prototype = {
             if(tile !== 0){
                 const j = Math.floor(index/4);
                 const i = index - (j*4);
-                this.boardGroup.placePiece(i,j);
+                this.boardGroup.placePiece(i,j,tile);
             }
         });
     }
