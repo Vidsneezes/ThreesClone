@@ -83,6 +83,18 @@ BoardGroup.prototype = {
         var textPiece = this.textGroup.getFirstDead();
         textPiece.setText(value);
         textPiece.reset(i*presets.tileWidth+presets.xPad+presets.tileWidth*0.5 , j*presets.tileHeight+presets.yPad + presets.tileHeight* 0.5);
+    },
+    placeNewPiece: function(i,j,value){
+        var item = this.groupBase.getFirstDead();
+        item.reset(i*presets.tileWidth+presets.xPad,j*presets.tileHeight+presets.yPad);
+        item.alpha = 0;
+        game.add.tween(item).to({alpha: 1},100,"Linear",true);
+        var textPiece = this.textGroup.getFirstDead();
+        textPiece.setText(value);
+        textPiece.reset(i*presets.tileWidth+presets.xPad+presets.tileWidth*0.5 , j*presets.tileHeight+presets.yPad + presets.tileHeight* 0.5);
+        textPiece.alpha = 0;
+        game.add.tween(textPiece).to({alpha: 1},100,"Linear",true);
+        
     }
 }
 
@@ -138,11 +150,6 @@ PhaserGame.prototype = {
     },
     makeMove(typeDef){
         this.moveTileLogic(typeDef);
-        this.trySpawnNew();
-        this.printTiles();
-        this.boardRebuildGroup();
-    },
-    trySpawnNew: function(){
         let container = [];
         for(var i = 0; i < this.tiles.length;i++){
             if(this.tiles[i] === 0){
@@ -150,10 +157,19 @@ PhaserGame.prototype = {
             }
             this.tiles[i] = Math.abs(this.tiles[i]);
         }
+        this.boardRebuildGroup();
+        this.trySpawnNew(container);
+        this.printTiles();
+    },
+    trySpawnNew: function(container){
         const unclampRand = Math.floor(Math.random() * container.length);
         const randM = Math.min(Math.max(0,unclampRand),container.length-1);
+        const index = container[randM];
         if(container.length > 0){
-            this.tiles[container[randM]] = 1;
+            this.tiles[index] = 1;
+            const j = Math.floor(index/4);
+            const i = index - (j*4);
+            this.boardGroup.placeNewPiece(i,j,1);
         }
     },
     moveTileLogic: function(typeDef){
