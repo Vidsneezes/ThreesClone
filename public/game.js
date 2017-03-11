@@ -1,5 +1,6 @@
 var game = new Phaser.Game(410, 395, Phaser.AUTO, '2048game');
 
+
 var PhaserGame = function () {
 
 }
@@ -177,8 +178,8 @@ PhaserGame.prototype = {
 
     },
     preload: function() {
-        game.load.image('playBoard','static/assets/images/PlayBoard.png');
-        game.load.image('playPiece','static/assets/images/PlayPiece.png');
+        game.load.image('playBoard','public/assets/images/PlayBoard.png');
+        game.load.image('playPiece','public/assets/images/PlayPiece.png');
     },
     create: function(){
         var test = game.add.sprite(5,5,'playBoard');

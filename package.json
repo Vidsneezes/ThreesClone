@@ -4,17 +4,18 @@
   "description": "a clone of a clone",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start-index": "node server/expressserver.js",
+    "start": "webpack-dev-server --hot"
   },
   "author": "oscar morales",
   "license": "ISC",
   "dependencies": {
     "express": "^4.15.0",
     "react": "^15.4.2",
-    "react-dom": "^15.4.2"
+    "react-dom": "^15.4.2",
+    "webpack": "^2.2.1",
+    "webpack-dev-server": "^2.4.1"
   },
   "devDependencies": {
-    "grunt": "^1.0.1"
   }
 }
