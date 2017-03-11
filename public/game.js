@@ -65,6 +65,12 @@ BoardGroup.prototype = {
                 i:0,
                 j:0
             };
+            extil.futurePos = {
+                x: 0,
+                y: 0
+            };
+            extil.moveOn = false;
+            extil.toBeRemove = false;
        }
        this.groupBase.forEach(function(item){
             item.kill();
@@ -81,28 +87,43 @@ BoardGroup.prototype = {
             item.kill();
         })
     },
-    removePiece: function(i,j){
-        var ended = false;
-        this.groupBase.forEachAlive(function(item){
-            if(ended == false && item.indexPos.i === i && item.indexPos.j === j){
-                item.kill();
-                ended = true;
-            }
-        });
-    },
-    movePiece: function(i,j,indexThen){
+    promptMove: function(i,j,indexThen){
         var ended = false;
         this.groupBase.forEachAlive(function(item){
             if(ended === false && item.indexPos.i === i && item.indexPos.j === j){
                 const newJ = Math.floor(indexThen/4);
                 const newI = indexThen - (newJ*4);
                 item.indexPos = {
-                    i: newI,
+                    i:newI,
                     j:newJ
                 };
+                item.moveOn = true;
                 ended = true;
-                item.reset(newI*presets.tileWidth+presets.xPad,newJ*presets.tileHeight+presets.yPad);
-               // game.add.tween(item).to({x:newI*presets.tileWidth+presets.xPad,y:newJ*presets.tileHeight+presets.yPad},320,"Linear",true);
+            }
+        });
+    },
+    promptRemove: function(i,j){
+        var ended = false;
+        this.groupBase.forEachAlive(function(item){
+            if(ended == false && item.indexPos.i === i && item.indexPos.j === j){
+                ended = true;
+                item.toBeRemove = true;
+            }
+        });
+    },
+    removePieces: function(i,j){
+        this.groupBase.forEach(function(item){
+            if(item.toBeRemove === true){
+                item.kill();
+                item.toBeRemove = false;
+            }
+        });
+    },
+    movePieces: function(){
+        this.groupBase.forEachAlive(function(item){
+            if(item.moveOn === true && item.toBeRemove === false){
+                item.moveOn = false;
+                game.add.tween(item).to({x:item.indexPos.i*presets.tileWidth+presets.xPad,y:item.indexPos.j*presets.tileHeight+presets.yPad},65,"Linear",true);
             }
         });
     },
@@ -212,8 +233,11 @@ PhaserGame.prototype = {
         }
         this.trySpawnNew(container);
         this.printTiles();
-        this.boardGroup.groupBase.sort('y',Phaser.Group.SORT_ASCENDING);
+        this.boardGroup.movePieces();
+        this.boardGroup.removePieces();
+        game.time.events.add(70,()=>{ this.boardGroup.groupBase.sort('y',Phaser.Group.SORT_ASCENDING);this.state = 0;},this)
         this.boardGroup.rebuildText(this.tiles);
+        this.state = 1;
     },
     trySpawnNew: function(container){
         const unclampRand = Math.floor(Math.random() * container.length);
@@ -224,6 +248,7 @@ PhaserGame.prototype = {
             const j = Math.floor(index/4);
             const i = index - (j*4);
             this.boardGroup.placeNewPiece(i,j,1);
+            this.boardGroup.groupBase.sort('y',Phaser.Group.SORT_ASCENDING);
         }
     },
     moveTileLogic: function(typeDef){
@@ -303,15 +328,15 @@ PhaserGame.prototype = {
         if(indexThem === 0){
             this.tiles[nextThen] = value;
             this.tiles[tile.i+tile.j*4] = 0; 
-            this.boardGroup.movePiece(tile.i,tile.j,nextThen);
+            this.boardGroup.promptMove(tile.i,tile.j,nextThen);
             recurser(tile.i+tile.hor,tile.j + tile.ver,tile.canCombine);
         }else if(indexThem === value && tile.canCombine === true){
             const newJ = Math.floor(nextThen/4);
             const newI = nextThen - (newJ*4);
-            this.boardGroup.removePiece(newI,newJ);
+            this.boardGroup.promptRemove(newI,newJ);
             this.tiles[nextThen] = -(value + value);
             this.tiles[tile.i+tile.j*4] = 0;
-            this.boardGroup.movePiece(tile.i,tile.j,nextThen);
+            this.boardGroup.promptMove(tile.i,tile.j,nextThen);
             recurser(tile.i+tile.hor,tile.j+tile.ver,false);
         }
     },
