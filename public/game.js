@@ -19,7 +19,8 @@ var presets = {
             xPad: 5,
             yPad: 2,
             tileWidth: 100,
-            tileHeight: 95
+            tileHeight: 95,
+            moveWait: 150
         }
 
 var style = { font: "35px Arial", fill: "#749de0", align: "center" };
@@ -123,7 +124,7 @@ BoardGroup.prototype = {
         this.groupBase.forEachAlive(function(item){
             if(item.moveOn === true && item.toBeRemove === false){
                 item.moveOn = false;
-                game.add.tween(item).to({x:item.indexPos.i*presets.tileWidth+presets.xPad,y:item.indexPos.j*presets.tileHeight+presets.yPad},65,"Linear",true);
+                game.add.tween(item).to({x:item.indexPos.i*presets.tileWidth+presets.xPad,y:item.indexPos.j*presets.tileHeight+presets.yPad},presets.moveWait,"Linear",true);
             }
         });
     },
@@ -183,10 +184,7 @@ PhaserGame.prototype = {
         var test = game.add.sprite(5,5,'playBoard');
         this.boardGroup = new BoardGroup();
         this.boardGroup.init();
-        this.tiles = [1,0,0,0,
-                     0,0,0,0,
-                     0,0,1,0,
-                     0,0,0,0];
+        this.tiles = [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0];
         this.printTiles();
         this.boardRebuildGroup();
         this.boardGroup.rebuildText(this.tiles);
@@ -231,12 +229,15 @@ PhaserGame.prototype = {
             }
             this.tiles[i] = Math.abs(this.tiles[i]);
         }
-        this.trySpawnNew(container);
         this.printTiles();
         this.boardGroup.movePieces();
         this.boardGroup.removePieces();
-        game.time.events.add(70,()=>{ this.boardGroup.groupBase.sort('y',Phaser.Group.SORT_ASCENDING);this.state = 0;},this)
-        this.boardGroup.rebuildText(this.tiles);
+        game.time.events.add(presets.moveWait + 4,()=>{ 
+            this.boardGroup.groupBase.sort('y',Phaser.Group.SORT_ASCENDING);
+            this.state = 0;
+            this.trySpawnNew(container);
+            this.boardGroup.rebuildText(this.tiles);
+        },this)
         this.state = 1;
     },
     trySpawnNew: function(container){
