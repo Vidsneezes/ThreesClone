@@ -5,10 +5,6 @@ var PhaserGame = function () {
 
 }
 
-var BoardPiece = function() {
-
-}
-
 var BoardGroup = function() {
 }
 
@@ -25,35 +21,6 @@ var presets = {
         }
 
 var style = { font: "35px Arial", fill: "#749de0", align: "center" };
-
-BoardPiece.prototype = {
-    init: function(i, j) {
-        this.baseValue = 2;
-        this.indexedPosition = {
-            x:i,y:j
-        }
-        this.sprite = game.add.sprite(i*presets.tileWidth+presets.xPad,j*presets.tileHeight+presets.yPad,'playPiece');
-    },
-    movePiece: function(){
-        this.sprite.x = this.indexedPosition.x*presets.tileWidth+presets.xPad;
-        this.sprite.y = this.indexedPosition.y*presets.tileHeight+presets.yPad;
-        this.text.x = this.indexedPosition.x*presets.tileWidth+presets.xPad+presets.tileWidth*0.5;
-        this.text.y = this.indexedPosition.y*presets.tileHeight+presets.yPad + presets.tileHeight* 0.5;
-    },
-    TryMove: function(x,y,checkCollision){
-        if( this.indexedPosition.x + x >= 0 && this.indexedPosition.y + y >= 0 &&
-            this.indexedPosition.x + x < 4 && this.indexedPosition.y + y < 4){
-            this.indexedPosition = {
-                x: this.indexedPosition.x + x, y:this.indexedPosition.y + y
-            }
-            this.movePiece();
-        }
-    },
-    changeValue: function(){
-        this.baseValue = 4;
-        this.text.setText(this.baseValue);
-    }
-}
 
 BoardGroup.prototype = {
     init: function(){
@@ -179,7 +146,20 @@ PhaserGame.prototype = {
     },
     preload: function() {
         game.load.image('playBoard','public/assets/images/PlayBoard.png');
-        game.load.image('playPiece','public/assets/images/PlayPiece.png');
+        game.load.image('playpiece1','public/assets/images/playpiece1.png');
+        game.load.image('playpiece2','public/assets/images/playpiece2.png');
+        game.load.image('playpiece4','public/assets/images/playpiece4.png');
+        game.load.image('playpiece8','public/assets/images/playpiece8.png');
+        game.load.image('playpiece16','public/assets/images/playpiece16.png');
+        game.load.image('playpiece32','public/assets/images/playpiece32.png');
+        game.load.image('playpiece64','public/assets/images/playpiece64.png');
+        game.load.image('playpiece128','public/assets/images/playpiece128.png');
+        game.load.image('playpiece256','public/assets/images/playpiece256.png');
+        game.load.image('playpiece512','public/assets/images/playpiece512.png');
+        game.load.image('playpiece1024','public/assets/images/playpiece1024.png');
+        game.load.image('playpiece2048','public/assets/images/playpiece2048.png');
+        game.load.image('playpiecex','public/assets/images/playpiecex.png');
+        
     },
     create: function(){
         var test = game.add.sprite(5,5,'playBoard');
