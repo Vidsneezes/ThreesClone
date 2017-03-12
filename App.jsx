@@ -360,8 +360,10 @@ class App extends React.Component {
     render(){
         game.state.add('Game',PhaserGame, true);
         return (
-            <div className={styles.main}>
-                Hello World!!!
+            <div >
+                <div className={styles.border}>
+                </div>
+                <div id="2048game" className={styles.game}></div>
             </div>
         );
     }
