@@ -340,7 +340,7 @@ PhaserGame.prototype = {
             this.boardGroup.promptRemove(newI,newJ);
             this.tiles[nextThen] = -(value + value);
             this.tiles[tile.i+tile.j*4] = 0;
-            score = updateScore(score);
+            score = updateScore(score, value+value*0.5);
             this.boardGroup.promptMove(tile.i,tile.j,nextThen,Math.abs(this.tiles[nextThen]));
             recurser(tile.i+tile.hor,tile.j+tile.ver,false);
         }
@@ -369,8 +369,8 @@ class App extends React.Component {
         game.state.add('Game',PhaserGame, true);
     }
 
-    handleScoreUpdate(lastScore) {
-        lastScore++;
+    handleScoreUpdate(lastScore,expo) {
+        lastScore = lastScore + Math.ceil(expo);
         this.setState({
             score: lastScore
         });
