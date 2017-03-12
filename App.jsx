@@ -223,7 +223,6 @@ PhaserGame.prototype = {
         }
     },
     makeMove(typeDef){
-        score = updateScore(score);
         this.moveTileLogic(typeDef);
         let container = [];
         for(var i = 0; i < this.tiles.length;i++){
@@ -341,6 +340,7 @@ PhaserGame.prototype = {
             this.boardGroup.promptRemove(newI,newJ);
             this.tiles[nextThen] = -(value + value);
             this.tiles[tile.i+tile.j*4] = 0;
+            score = updateScore(score);
             this.boardGroup.promptMove(tile.i,tile.j,nextThen,Math.abs(this.tiles[nextThen]));
             recurser(tile.i+tile.hor,tile.j+tile.ver,false);
         }
