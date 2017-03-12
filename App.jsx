@@ -28,6 +28,10 @@ var presets = {
 
 var style = { font: "35px Arial", fill: "#749de0", align: "center" };
 
+var score = 0;
+
+var updateScore;
+
 BoardGroup.prototype = {
     init: function(){
        this.groupBase = game.add.group();
@@ -61,7 +65,6 @@ BoardGroup.prototype = {
     },
     promptMove: function(i,j,indexThen, value){
         var ended = false;
-        console.log(value);
         this.groupBase.forEachAlive(function(item){
             if(ended === false && item.indexPos.i === i && item.indexPos.j === j){
                 const newJ = Math.floor(indexThen/4);
@@ -220,6 +223,7 @@ PhaserGame.prototype = {
         }
     },
     makeMove(typeDef){
+        score = updateScore(score);
         this.moveTileLogic(typeDef);
         let container = [];
         for(var i = 0; i < this.tiles.length;i++){
@@ -350,18 +354,34 @@ PhaserGame.prototype = {
                 this.boardGroup.placePiece(i,j,tile);
             }
         });
-    },
-    gameStart: function(){
-        game.state.add('Game',PhaserGame, true);
     }
+  
 };
 
 class App extends React.Component {
-    render(){
+    constructor(props){
+        super(props);
+        this.state ={
+            score: 0
+        }
+        this.handleScoreUpdate = this.handleScoreUpdate.bind(this);
+        updateScore = this.handleScoreUpdate;
         game.state.add('Game',PhaserGame, true);
+    }
+
+    handleScoreUpdate(lastScore) {
+        lastScore++;
+        this.setState({
+            score: lastScore
+        });
+        return lastScore;
+    }
+
+    render(){
         return (
             <div >
                 <div className={styles.border}>
+                    Score = {this.state.score}
                 </div>
                 <div id="2048game" className={styles.game}></div>
             </div>
