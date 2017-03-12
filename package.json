@@ -10,12 +10,17 @@
   "author": "oscar morales",
   "license": "ISC",
   "dependencies": {
+    "expose-loader": "^0.7.3",
     "express": "^4.15.0",
+    "phaser": "^2.6.2",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-router": "^4.0.0",
     "webpack": "^2.2.1",
     "webpack-dev-server": "^2.4.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "css-loader": "^0.27.1",
+    "style-loader": "^0.13.2"
+  }
 }
