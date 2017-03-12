@@ -29,14 +29,11 @@ BoardGroup.prototype = {
        for(var i = 0; i < 16; i++){
             var text = game.add.text(0*presets.tileWidth+presets.xPad+presets.tileWidth*0.5 , 0*presets.tileHeight+presets.yPad + presets.tileHeight* 0.5, "2", style, this.textGroup);
             text.anchor.set(0.5);
-            var extil = this.groupBase.create(20+ i,20,'playPiece');
+            var extil = this.groupBase.create(20+ i,20,'playpiece1');
             extil.indexPos = {
                 i:0,
-                j:0
-            };
-            extil.futurePos = {
-                x: 0,
-                y: 0
+                j:0,
+                value: 1
             };
             extil.moveOn = false;
             extil.toBeRemove = false;
@@ -56,15 +53,17 @@ BoardGroup.prototype = {
             item.kill();
         })
     },
-    promptMove: function(i,j,indexThen){
+    promptMove: function(i,j,indexThen, value){
         var ended = false;
+        console.log(value);
         this.groupBase.forEachAlive(function(item){
             if(ended === false && item.indexPos.i === i && item.indexPos.j === j){
                 const newJ = Math.floor(indexThen/4);
                 const newI = indexThen - (newJ*4);
                 item.indexPos = {
                     i:newI,
-                    j:newJ
+                    j:newJ,
+                    value: value
                 };
                 item.moveOn = true;
                 ended = true;
@@ -96,13 +95,24 @@ BoardGroup.prototype = {
             }
         });
     },
+    moveDone: function(){
+        this.groupBase.forEachAlive(function(item){
+            if(item.indexPos.value < 3000){
+                item.loadTexture("playpiece"+item.indexPos.value);
+            }else {
+                item.loadTexture("playpiecex");
+            }
+        })
+    },
     placePiece: function(i,j, value){
         var item = this.groupBase.getFirstDead();
         item.reset(i*presets.tileWidth+presets.xPad,j*presets.tileHeight+presets.yPad);
         item.indexPos = {
             i: i,
-            j:j
+            j:j,
+            value: 1
         };
+        item.loadTexture("playpiece"+item.indexPos.value);
         //var textPiece = this.textGroup.getFirstDead();
         //textPiece.setText(value);
        //textPiece.reset(i*presets.tileWidth+presets.xPad+presets.tileWidth*0.5 , j*presets.tileHeight+presets.yPad + presets.tileHeight* 0.5);
@@ -113,8 +123,10 @@ BoardGroup.prototype = {
         item.alpha = 0;
         item.indexPos = {
             i:i,
-            j:j
+            j:j,
+            value:1
         };
+        item.loadTexture("playpiece"+item.indexPos.value);
         game.add.tween(item).to({alpha: 1},100,"Linear",true);
         //var textPiece = this.textGroup.getFirstDead();
         //textPiece.setText(value);
@@ -212,8 +224,9 @@ PhaserGame.prototype = {
         }
         this.printTiles();
         this.boardGroup.movePieces();
-        this.boardGroup.removePieces();
         game.time.events.add(presets.moveWait + 4,()=>{ 
+            this.boardGroup.removePieces();
+            this.boardGroup.moveDone();
             this.boardGroup.groupBase.sort('y',Phaser.Group.SORT_ASCENDING);
             this.state = 0;
             this.trySpawnNew(container);
@@ -310,7 +323,7 @@ PhaserGame.prototype = {
         if(indexThem === 0){
             this.tiles[nextThen] = value;
             this.tiles[tile.i+tile.j*4] = 0; 
-            this.boardGroup.promptMove(tile.i,tile.j,nextThen);
+            this.boardGroup.promptMove(tile.i,tile.j,nextThen,this.tiles[nextThen]);
             recurser(tile.i+tile.hor,tile.j + tile.ver,tile.canCombine);
         }else if(indexThem === value && tile.canCombine === true){
             const newJ = Math.floor(nextThen/4);
@@ -318,7 +331,7 @@ PhaserGame.prototype = {
             this.boardGroup.promptRemove(newI,newJ);
             this.tiles[nextThen] = -(value + value);
             this.tiles[tile.i+tile.j*4] = 0;
-            this.boardGroup.promptMove(tile.i,tile.j,nextThen);
+            this.boardGroup.promptMove(tile.i,tile.j,nextThen,Math.abs(this.tiles[nextThen]));
             recurser(tile.i+tile.hor,tile.j+tile.ver,false);
         }
     },
