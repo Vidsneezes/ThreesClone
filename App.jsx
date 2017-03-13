@@ -380,6 +380,10 @@ class App extends React.Component {
     render(){
         return (
             <div className={styles.main} >
+                <div className={styles.overlay}>
+                    <div className={styles.modal}><p>Game Over!</p>
+                    <p>Your Score was: {this.state.score}</p></div>
+                </div>
                 <div className={styles.border}>
                     <p className={styles.score}>
                     Score = {this.state.score}
