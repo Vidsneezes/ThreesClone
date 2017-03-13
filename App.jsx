@@ -188,7 +188,7 @@ PhaserGame.prototype = {
         var test = game.add.sprite(5,5,'playBoard');
         this.boardGroup = new BoardGroup();
         this.boardGroup.init();
-        this.tiles = [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0];
+        this.tiles = [1,4,2,1,8,2,4,16,16,4,2,8,1,2,4,0];
         this.printTiles();
         this.boardRebuildGroup();
         this.boardGroup.rebuildText(this.tiles);
@@ -256,6 +256,53 @@ PhaserGame.prototype = {
             this.boardGroup.placeNewPiece(i,j,1);
             this.boardGroup.groupBase.sort('y',Phaser.Group.SORT_ASCENDING);
         }
+        this.checkGameOver();
+    },
+    checkGameOver: function(){
+        var max = 0;
+        for(var i = 0; i < this.tiles.length;i++){
+            if(this.tiles[i] > 0){
+                max++;
+            }
+        }
+        if(max ===16){
+            let gameOver = true;
+            
+            for(var i=0; i < this.tiles.length;i++){
+                const y = Math.floor(i/4);
+                const x = i - (y*4);
+                if(x + 1< 4){
+                    if(this.tiles[(x+1)+y*4] === this.tiles[x+y*4]){
+                        gameOver = false;
+                        break;
+                    } 
+                }
+                if(x-1>= 0){
+                    if(this.tiles[(x-1)+y*4] === this.tiles[x+y*4]){
+                        gameOver = false;
+                        break;
+                    } 
+                }
+                if(y+1 < 4){
+                    if(this.tiles[x+(y+1)*4] === this.tiles[x+y*4]){
+                        gameOver = false;
+                        break;
+                    }
+                }
+                if(y-1 >= 0){
+                    if(this.tiles[x+(y-1)*4] === this.tiles[x+y*4]){
+                        gameOver = false;
+                        break;
+                    }
+                }
+                
+            }
+            if(gameOver===true){
+                onNoMoreMoves();
+                this.state = 3;
+            }
+        }
+        console.log("Max: "+max);
     },
     moveTileLogic: function(typeDef){
         if(typeDef === 0){
@@ -370,6 +417,7 @@ class App extends React.Component {
         this.handleScoreUpdate = this.handleScoreUpdate.bind(this);
         this.onNoMoreMoves = this.onNoMoreMoves.bind(this);
         updateScore = this.handleScoreUpdate;
+        onNoMoreMoves = this.onNoMoreMoves;
         game.state.add('Game',PhaserGame, true);
     }
 
@@ -409,7 +457,7 @@ class App extends React.Component {
                      <div id="2048game" className={styles.game}></div>
                 </div>
                 <div className={styles.footer}>
-                <p>Welcome! Please try my game, clone of clone that is.</p>
+                <p>Welcome! Try to score 1200! (my clone game).</p>
                 <p>Use the Arrow Keys to move the pieces around</p>
                 </div>
             </div>
