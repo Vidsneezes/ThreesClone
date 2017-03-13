@@ -32,6 +32,8 @@ var score = 0;
 
 var updateScore;
 
+var onNoMoreMoves;
+
 BoardGroup.prototype = {
     init: function(){
        this.groupBase = game.add.group();
@@ -362,9 +364,11 @@ class App extends React.Component {
     constructor(props){
         super(props);
         this.state ={
-            score: 0
+            score: 0,
+            gameDone: false
         }
         this.handleScoreUpdate = this.handleScoreUpdate.bind(this);
+        this.onNoMoreMoves = this.onNoMoreMoves.bind(this);
         updateScore = this.handleScoreUpdate;
         game.state.add('Game',PhaserGame, true);
     }
@@ -377,13 +381,27 @@ class App extends React.Component {
         return lastScore;
     }
 
+    onNoMoreMoves(){
+        this.setState({
+            gameDone: true
+        });
+    }
+
     render(){
+        let gameOver = null;
+        if(this.state.gameDone)
+        {
+            gameOver =  (
+                <div className={styles.overlay}>
+                        <div className={styles.modal}><p>Game Over!</p>
+                        <p>Your Score was: {this.state.score}</p></div>
+                    </div>
+            );
+        }
+
         return (
             <div className={styles.main} >
-                <div className={styles.overlay}>
-                    <div className={styles.modal}><p>Game Over!</p>
-                    <p>Your Score was: {this.state.score}</p></div>
-                </div>
+                {gameOver}
                 <div className={styles.border}>
                     <p className={styles.score}>
                     Score = {this.state.score}
