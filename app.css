@@ -1,14 +1,17 @@
+
 .main {
     left: 0;
     color:red;
+    position: relative;
+    overflow: hidden;
 }
 
 .game {
-  float: left;
-  position: relative;
-  left: 30%;
-  margin-top: 10px;
-  box-shadow: 10px 10px 5px #888888;
+    float: left;
+    position: relative;
+    left: 35%;
+    margin-top: 40px;
+    box-shadow: 10px 10px 5px #888888;
 }
 
 .border {
@@ -18,4 +21,21 @@
     height: 30px;
     width: 100%;
     background-color: darkslategray;
+}
+
+.score {
+    margin: -10px;
+    text-align: center;
+    font-weight: 900;
+    font-size: 200%;
+}
+
+.footer {
+    color:white;
+    height: 30px;
+    width: 100%;
+    position: absolute;
+    bottom: -10px;
+    background-color: darkslategray;
+
 }

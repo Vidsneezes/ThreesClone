@@ -381,9 +381,13 @@ class App extends React.Component {
         return (
             <div >
                 <div className={styles.border}>
+                    <p className={styles.score}>
                     Score = {this.state.score}
+                    </p>
                 </div>
                 <div id="2048game" className={styles.game}></div>
+                <p>Welcome Please have a go at my clone game, clone of clone that is.</p>
+                <div className={styles.footer}></div>
             </div>
         );
     }
