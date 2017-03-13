@@ -1,18 +1,15 @@
+@import url('https://fonts.googleapis.com/css?family=Baloo+Bhaina');
 
 .main {
     left: 0;
     color:red;
     position: relative;
     overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    font-family: 'Baloo Bhaina', cursive;
 }
 
-.game {
-    float: left;
-    position: relative;
-    left: 35%;
-    margin-top: 40px;
-    box-shadow: 10px 10px 5px #888888;
-}
 
 .border {
     color:white;
@@ -21,6 +18,18 @@
     height: 30px;
     width: 100%;
     background-color: darkslategray;
+     box-shadow: 0px 1px 100px darkgoldenrod;
+}
+
+.game {
+    float: left;
+    position: relative;
+    width: 410px;
+    height: 395px;
+    left: 35%;
+    top: 100%;
+    border: 2px solid palegreen;
+    box-shadow: 10px 10px 5px darkgoldenrod;
 }
 
 .score {
@@ -31,11 +40,15 @@
 }
 
 .footer {
-    color:white;
-    height: 30px;
-    width: 100%;
     position: absolute;
-    bottom: -10px;
+    bottom: 0px;
+    color:palevioletred;
+    width: 100%;
     background-color: darkslategray;
-
+    text-align: center;
+    font-weight: 710;
+    font-size: 165%;
+    line-height: 50%;
+    box-shadow: 0px -1px 100px darkgoldenrod;
+    
 }

@@ -1,9 +1,6 @@
-@import url('https://fonts.googleapis.com/css?family=Baloo+Bhaina');
 
 body {
     margin: 0px;
     background: palegoldenrod;
     overflow: hidden;
-    font-family: 'Baloo Bhaina', cursive;
-        display: inline;
 }
