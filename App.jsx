@@ -188,7 +188,12 @@ PhaserGame.prototype = {
         var test = game.add.sprite(5,5,'playBoard');
         this.boardGroup = new BoardGroup();
         this.boardGroup.init();
-        this.tiles = [1,4,2,1,8,2,4,16,16,4,2,8,1,2,4,0];
+        let rand9 = Math.floor((Math.random() * 7));
+        let rand0 = 7 + Math.ceil((Math.random()*7));
+        console.log(rand9 + " " + rand0);
+        this.tiles = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+        this.tiles[rand0] = 1;
+        this.tiles[rand9] = 1;
         this.printTiles();
         this.boardRebuildGroup();
         this.boardGroup.rebuildText(this.tiles);
